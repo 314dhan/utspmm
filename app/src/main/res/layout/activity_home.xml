@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Text untuk pesan selamat datang -->
+    <TextView
+        android:id="@+id/tvWelcomeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome!"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Tombol logout di sebelah kanan -->
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/tvWelcomeMessage"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="12dp"/>
+
+    <!-- RecyclerView untuk menampilkan data mahasiswa -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvStudentData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tvWelcomeMessage"
+        android:visibility="gone"/>
+
+    <!-- Pesan jika data tidak ada -->
+    <TextView
+        android:id="@+id/tvNoDataMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data is not available"
+        android:visibility="gone"
+        android:textSize="18sp"
+        android:textColor="#FF0000"
+        android:layout_below="@id/tvWelcomeMessage"
+        android:layout_marginTop="20dp"/>
+
+</RelativeLayout>
