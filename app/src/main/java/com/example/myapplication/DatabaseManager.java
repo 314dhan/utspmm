@@ -13,6 +13,26 @@ public class DatabaseManager {
     private SQLiteDatabase db;
     private DatabaseHelper dbHelper;
 
+    // Method untuk mengambil barang yang sudah dibeli
+    public List<Barang> getBarangSudahDibeli() {
+        List<Barang> barangList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM shopping_list WHERE status_pembelian = 1", null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String namaBarang = cursor.getString(cursor.getColumnIndex("nama_barang"));
+                int jumlahBarang = cursor.getInt(cursor.getColumnIndex("jumlah_barang"));
+                double hargaBarang = cursor.getDouble(cursor.getColumnIndex("harga_barang"));
+                boolean statusPembelian = cursor.getInt(cursor.getColumnIndex("status_pembelian")) == 1;
+
+                barangList.add(new Barang(id, namaBarang, jumlahBarang, hargaBarang, statusPembelian));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return barangList;
+    }
+
     public DatabaseManager(Context context) {
         dbHelper = new DatabaseHelper(context);
         db = dbHelper.getWritableDatabase(); // Gunakan writable database untuk operasi insert/update/delete

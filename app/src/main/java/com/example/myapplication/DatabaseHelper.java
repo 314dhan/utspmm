@@ -30,13 +30,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            String CREATE_USERS_TABLE = "CREATE TABLE users (" +
+            // Membuat tabel users jika belum ada
+            String CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS users (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "username TEXT UNIQUE, " +
                     "password TEXT)";
             db.execSQL(CREATE_USERS_TABLE);
 
-            String CREATE_SHOPPING_LIST_TABLE = "CREATE TABLE shopping_list (" +
+            // Membuat tabel shopping_list jika belum ada
+            String CREATE_SHOPPING_LIST_TABLE = "CREATE TABLE IF NOT EXISTS shopping_list (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "nama_barang TEXT, " +
                     "jumlah_barang INTEGER, " +
@@ -48,8 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             android.util.Log.e("DatabaseHelper", "Error saat membuat tabel: " + e.getMessage());
         }
-
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

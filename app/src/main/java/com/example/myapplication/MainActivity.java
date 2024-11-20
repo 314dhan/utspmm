@@ -11,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvWelcomeMessage, tvNoDataMessage;
+    private TextView tvWelcomeMessage, tvSummary, tvNoDataMessage;
     private RecyclerView rvBarangData;
     private Button btnLogout;
     private DatabaseManager dbManager;
@@ -25,14 +27,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.deleteDatabase("app_database"); // Nama database sesuai dengan yang ada di DatabaseHelper
         setContentView(R.layout.activity_main);
 
         // Inisialisasi komponen UI
+        rvBarangData = findViewById(R.id.rvShoppingList);  // Inisialisasi RecyclerView
+        tvSummary = findViewById(R.id.tvSummary);
         tvWelcomeMessage = findViewById(R.id.tvWelcomeMessage);
-        rvBarangData = findViewById(R.id.rvShoppingList);
         tvNoDataMessage = findViewById(R.id.tvNoDataMessage);
         btnLogout = findViewById(R.id.btnLogout);
+        FloatingActionButton fabAddItem = findViewById(R.id.fabAddItem); // FloatingActionButton untuk tambah barang
 
         // Inisialisasi DatabaseManager
         dbManager = new DatabaseManager(this);
@@ -48,7 +51,18 @@ public class MainActivity extends AppCompatActivity {
         rvBarangData.setLayoutManager(new LinearLayoutManager(this));
 
         // Ambil data barang dari database
-        barangList = dbManager.getAllBarang(); // Method untuk mengambil semua data barang
+        barangList = dbManager.getAllBarang();
+
+        // Hitung total barang dan harga
+        int totalBarang = 0;
+        double totalHarga = 0.0;
+        for (Barang barang : barangList) {
+            totalBarang += barang.getJumlahBarang();
+            totalHarga += barang.getHargaBarang() * barang.getJumlahBarang();
+        }
+
+        // Update TextView dengan total jumlah barang dan total harga
+        tvSummary.setText("Total Barang: " + totalBarang + " | Total Harga: Rp " + totalHarga);
 
         // Cek apakah data barang ada
         if (barangList != null && !barangList.isEmpty()) {
@@ -62,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
             rvBarangData.setVisibility(View.GONE);    // Sembunyikan RecyclerView
             tvNoDataMessage.setVisibility(View.VISIBLE); // Tampilkan pesan "Data is not available"
         }
+
+        // FloatingActionButton untuk tambah barang
+        fabAddItem.setOnClickListener(v -> {
+            // Pindah ke activity InsertBarangActivity untuk menambah barang
+            Intent intent = new Intent(MainActivity.this, InsertBarangActivity.class);
+            startActivity(intent);
+        });
 
         // Tombol logout
         btnLogout.setOnClickListener(v -> {

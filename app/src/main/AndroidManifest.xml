@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".InsertBarangActivity"></activity> <!-- Tambahkan ini -->
         <activity android:name=".MainActivity" /> <!-- Ini adalah MainActivity kamu -->
         <activity android:name=".RegisterActivity" />
     </application>
