@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,15 +27,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateSummary() {
         int totalBarang = 0;
-        int totalHarga = 0;
+        double totalHarga = 0.0;
 
+        // Hitung total barang dan total harga berdasarkan data di barangList
         for (Barang barang : barangList) {
             totalBarang += barang.getJumlahBarang();
-            totalHarga += barang.getJumlahBarang() * barang.getHargaBarang();
+            totalHarga += barang.getHargaBarang() * barang.getJumlahBarang();
         }
 
-        // Update TextView
+        // Update tampilan summary
         tvSummary.setText("Total Barang: " + totalBarang + " | Total Harga: Rp " + totalHarga);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Data barang diupdate, perbarui RecyclerView
+            barangList.clear();
+            barangList.addAll(dbManager.getAllBarang());
+            barangAdapter.notifyDataSetChanged();  // Update RecyclerView
+            updateSummary();  // Perbarui summary
+        }
     }
 
     @Override
@@ -58,13 +73,20 @@ public class MainActivity extends AppCompatActivity {
         String username = prefs.getString("username", "User");
 
         // Tampilkan pesan welcome
-        tvWelcomeMessage.setText("Welcome, " + username + "!");
+        if (tvWelcomeMessage != null) {
+            tvWelcomeMessage.setText("Welcome, " + username + "!");
+        } else {
+            Log.e("MainActivity", "TextView tvWelcomeMessage tidak ditemukan!");
+        }
 
         // Setup RecyclerView
         rvBarangData.setLayoutManager(new LinearLayoutManager(this));
 
         // Ambil data barang dari database
         barangList = dbManager.getAllBarang();
+
+        // Update summary setelah mendapatkan data barang
+        updateSummary();
 
         // Cek apakah data barang ada
         if (barangList != null && !barangList.isEmpty()) {

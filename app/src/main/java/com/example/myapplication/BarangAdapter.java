@@ -53,12 +53,14 @@ public class BarangAdapter extends RecyclerView.Adapter<BarangAdapter.BarangView
     public class BarangViewHolder extends RecyclerView.ViewHolder {
         private TextView tvNamaBarang;
         private TextView tvJumlahBarang;
+        private TextView tvHargaBarang;
         private ImageButton btnDelete;
 
         public BarangViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNamaBarang = itemView.findViewById(R.id.tvNamaBarang);
+            tvNamaBarang = itemView.findViewById(R.id.tvNamaBarang);  // Hanya deklarasi sekali
             tvJumlahBarang = itemView.findViewById(R.id.tvJumlahBarang);
+            tvHargaBarang = itemView.findViewById(R.id.tvHargaBarang);  // Pastikan menambahkan deklarasi untuk tvHargaBarang
             btnDelete = itemView.findViewById(R.id.btnDelete);
 
             // Listener untuk klik item
@@ -82,9 +84,11 @@ public class BarangAdapter extends RecyclerView.Adapter<BarangAdapter.BarangView
             });
         }
 
+
         public void bind(Barang barang) {
             tvNamaBarang.setText(barang.getNamaBarang());
             tvJumlahBarang.setText("Jumlah: " + barang.getJumlahBarang());
+            tvHargaBarang.setText("Harga: Rp " + barang.getHargaBarang());  // Pastikan harga ditampilkan dengan benar
         }
     }
 }
