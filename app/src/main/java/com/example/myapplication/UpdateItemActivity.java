@@ -2,9 +2,9 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class UpdateItemActivity extends AppCompatActivity {
@@ -33,7 +33,10 @@ public class UpdateItemActivity extends AppCompatActivity {
             etNamaBarang.setText(barang.getNamaBarang());
             etJumlahBarang.setText(String.valueOf(barang.getJumlahBarang()));
             etHargaBarang.setText(String.valueOf(barang.getHargaBarang()));
+        } else {
+            Log.e("UpdateItemActivity", "Barang is null");
         }
+
 
         // Update barang ketika tombol update ditekan
         btnUpdate.setOnClickListener(v -> {
@@ -55,4 +58,3 @@ public class UpdateItemActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> finish());
     }
 }
-

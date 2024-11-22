@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +45,13 @@ public class BarangAdapter extends RecyclerView.Adapter<BarangAdapter.BarangView
     public void onBindViewHolder(@NonNull BarangViewHolder holder, int position) {
         Barang barang = barangList.get(position);
         holder.bind(barang);
+
+        // Memberikan listener untuk delete
+        holder.btnDelete.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onItemDelete(barang, position);
+            }
+        });
     }
 
     @Override
@@ -58,9 +67,9 @@ public class BarangAdapter extends RecyclerView.Adapter<BarangAdapter.BarangView
 
         public BarangViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNamaBarang = itemView.findViewById(R.id.tvNamaBarang);  // Hanya deklarasi sekali
+            tvNamaBarang = itemView.findViewById(R.id.tvNamaBarang);
             tvJumlahBarang = itemView.findViewById(R.id.tvJumlahBarang);
-            tvHargaBarang = itemView.findViewById(R.id.tvHargaBarang);  // Pastikan menambahkan deklarasi untuk tvHargaBarang
+            tvHargaBarang = itemView.findViewById(R.id.tvHargaBarang);
             btnDelete = itemView.findViewById(R.id.btnDelete);
 
             // Listener untuk klik item
@@ -68,27 +77,21 @@ public class BarangAdapter extends RecyclerView.Adapter<BarangAdapter.BarangView
                 if (clickListener != null) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        clickListener.onItemClick(barangList.get(position));
-                    }
-                }
-            });
-
-            // Listener untuk tombol hapus
-            btnDelete.setOnClickListener(v -> {
-                if (deleteListener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        deleteListener.onItemDelete(barangList.get(position), position);
+                        Barang barang = barangList.get(position);
+                        Context context = itemView.getContext(); // Mendapatkan context di sini
+                        Intent intent = new Intent(context, UpdateItemActivity.class);
+                        intent.putExtra("barang", barang); // Kirim data barang
+                        context.startActivity(intent);
                     }
                 }
             });
         }
-
 
         public void bind(Barang barang) {
             tvNamaBarang.setText(barang.getNamaBarang());
             tvJumlahBarang.setText("Jumlah: " + barang.getJumlahBarang());
-            tvHargaBarang.setText("Harga: Rp " + barang.getHargaBarang());  // Pastikan harga ditampilkan dengan benar
+            tvHargaBarang.setText("Harga: Rp " + barang.getHargaBarang());
         }
     }
 }
+

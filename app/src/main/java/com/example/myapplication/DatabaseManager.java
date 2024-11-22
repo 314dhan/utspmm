@@ -14,8 +14,13 @@ public class DatabaseManager {
 
     // Method untuk mengambil barang yang sudah dibeli
     public List<Barang> getBarangSudahDibeli() {
+        return getBarangByCondition("WHERE status_pembelian = 1");
+    }
+
+    // Method umum untuk mengambil barang berdasarkan kondisi tertentu
+    private List<Barang> getBarangByCondition(String kondisi) {
         List<Barang> barangList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM shopping_list WHERE status_pembelian = 1", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM shopping_list " + kondisi, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -27,11 +32,12 @@ public class DatabaseManager {
 
                 barangList.add(new Barang(id, namaBarang, jumlahBarang, hargaBarang, statusPembelian));
             } while (cursor.moveToNext());
-            cursor.close();
+            cursor.close(); // Pastikan cursor ditutup setelah selesai digunakan
         }
         return barangList;
     }
 
+    // Constructor
     public DatabaseManager(Context context) {
         dbHelper = new DatabaseHelper(context);
         db = dbHelper.getWritableDatabase(); // Gunakan writable database untuk operasi insert/update/delete
@@ -110,22 +116,21 @@ public class DatabaseManager {
     }
 
     // Method untuk memperbarui status pembelian barang
-    public void updateBarang(int id, String nama, int jumlah, double harga) {
+    public void updateBarang(int idBarang, String namaBarang, int jumlahBarang, double hargaBarang) {
+        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("nama_barang", nama);
-        values.put("jumlah_barang", jumlah);
-        values.put("harga_barang", harga);
+        values.put("nama_barang", namaBarang);
+        values.put("jumlah_barang", jumlahBarang);
+        values.put("harga_barang", hargaBarang);
 
-        db.update("shopping_list", values, "id=?", new String[]{String.valueOf(id)});
+        // Update berdasarkan id_barang
+        db.update("shopping_list", values, "id = ?", new String[]{String.valueOf(idBarang)});
     }
-
 
     // Method untuk menghapus barang dari tabel shopping_list
     public void deleteBarang(int id) {
         SQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        // Ganti nama tabel dari 'barang' menjadi 'shopping_list'
         db.delete("shopping_list", "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
-
 }
