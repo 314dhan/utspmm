@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,14 +110,22 @@ public class DatabaseManager {
     }
 
     // Method untuk memperbarui status pembelian barang
-    public void updateStatusPembelian(int id, boolean status) {
+    public void updateBarang(int id, String nama, int jumlah, double harga) {
         ContentValues values = new ContentValues();
-        values.put("status_pembelian", status ? 1 : 0);
+        values.put("nama_barang", nama);
+        values.put("jumlah_barang", jumlah);
+        values.put("harga_barang", harga);
+
         db.update("shopping_list", values, "id=?", new String[]{String.valueOf(id)});
     }
 
+
     // Method untuk menghapus barang dari tabel shopping_list
-    public void hapusBarang(int id) {
-        db.delete("shopping_list", "id=?", new String[]{String.valueOf(id)});
+    public void deleteBarang(int id) {
+        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        // Ganti nama tabel dari 'barang' menjadi 'shopping_list'
+        db.delete("shopping_list", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
     }
+
 }

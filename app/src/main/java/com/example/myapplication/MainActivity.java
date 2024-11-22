@@ -17,12 +17,25 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvWelcomeMessage, tvSummary, tvNoDataMessage;
     private RecyclerView rvBarangData;
-    private Button btnLogout;
     private DatabaseManager dbManager;
-    private BarangAdapter barangAdapter;  // Adapter untuk RecyclerView
-    private List<Barang> barangList;      // List data barang
+    private BarangAdapter barangAdapter;
+    private List<Barang> barangList;
+    private TextView tvSummary, tvWelcomeMessage, tvNoDataMessage;
+    private Button btnLogout;
+
+    private void updateSummary() {
+        int totalBarang = 0;
+        int totalHarga = 0;
+
+        for (Barang barang : barangList) {
+            totalBarang += barang.getJumlahBarang();
+            totalHarga += barang.getJumlahBarang() * barang.getHargaBarang();
+        }
+
+        // Update TextView
+        tvSummary.setText("Total Barang: " + totalBarang + " | Total Harga: Rp " + totalHarga);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Inisialisasi komponen UI
-        rvBarangData = findViewById(R.id.rvShoppingList);  // Inisialisasi RecyclerView
+        rvBarangData = findViewById(R.id.rvShoppingList);
         tvSummary = findViewById(R.id.tvSummary);
         tvWelcomeMessage = findViewById(R.id.tvWelcomeMessage);
         tvNoDataMessage = findViewById(R.id.tvNoDataMessage);
         btnLogout = findViewById(R.id.btnLogout);
-        FloatingActionButton fabAddItem = findViewById(R.id.fabAddItem); // FloatingActionButton untuk tambah barang
+        FloatingActionButton fabAddItem = findViewById(R.id.fabAddItem);
 
         // Inisialisasi DatabaseManager
         dbManager = new DatabaseManager(this);
@@ -53,47 +66,61 @@ public class MainActivity extends AppCompatActivity {
         // Ambil data barang dari database
         barangList = dbManager.getAllBarang();
 
-        // Hitung total barang dan harga
-        int totalBarang = 0;
-        double totalHarga = 0.0;
-        for (Barang barang : barangList) {
-            totalBarang += barang.getJumlahBarang();
-            totalHarga += barang.getHargaBarang() * barang.getJumlahBarang();
-        }
-
-        // Update TextView dengan total jumlah barang dan total harga
-        tvSummary.setText("Total Barang: " + totalBarang + " | Total Harga: Rp " + totalHarga);
-
         // Cek apakah data barang ada
         if (barangList != null && !barangList.isEmpty()) {
             // Data ada, tampilkan di RecyclerView
-            barangAdapter = new BarangAdapter(barangList);
+            barangAdapter = new BarangAdapter(
+                    barangList,
+                    barang -> {
+                        // Klik untuk edit barang
+                        Intent intent = new Intent(this, UpdateItemActivity.class);
+                        intent.putExtra("barang_id", barang.getIdBarang());
+                        startActivity(intent);
+                    },
+                    (barang, position) -> {
+                        // Klik untuk hapus barang
+                        dbManager.deleteBarang(barang.getIdBarang());
+                        barangList.remove(position);
+                        barangAdapter.notifyItemRemoved(position);
+                        updateSummary();
+                    }
+            );
+
             rvBarangData.setAdapter(barangAdapter);
-            rvBarangData.setVisibility(View.VISIBLE);  // Tampilkan RecyclerView
-            tvNoDataMessage.setVisibility(View.GONE);   // Sembunyikan pesan "Data is not available"
+            rvBarangData.setVisibility(View.VISIBLE);
+            tvNoDataMessage.setVisibility(View.GONE);
         } else {
-            // Data tidak ada, tampilkan pesan
-            rvBarangData.setVisibility(View.GONE);    // Sembunyikan RecyclerView
-            tvNoDataMessage.setVisibility(View.VISIBLE); // Tampilkan pesan "Data is not available"
+            // Data tidak ada
+            rvBarangData.setVisibility(View.GONE);
+            tvNoDataMessage.setVisibility(View.VISIBLE);
         }
 
         // FloatingActionButton untuk tambah barang
         fabAddItem.setOnClickListener(v -> {
-            // Pindah ke activity InsertBarangActivity untuk menambah barang
             Intent intent = new Intent(MainActivity.this, InsertBarangActivity.class);
             startActivity(intent);
         });
 
         // Tombol logout
         btnLogout.setOnClickListener(v -> {
-            // Logout dan kembali ke LoginActivity
             SharedPreferences.Editor editor = prefs.edit();
-            editor.clear();  // Hapus semua data dari SharedPreferences
+            editor.clear();
             editor.apply();
 
-            // Pindah ke LoginActivity
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();  // Tutup MainActivity
+            finish();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data ketika kembali ke activity ini
+        barangList.clear();
+        barangList.addAll(dbManager.getAllBarang());
+        if (barangAdapter != null) {
+            barangAdapter.notifyDataSetChanged();
+        }
+        updateSummary();
     }
 }
